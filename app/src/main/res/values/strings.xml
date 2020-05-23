@@ -1,0 +1,11 @@
+
+<resources>
+    <string name="app_name">PROJECT</string>
+    <string name="prompt">LANGUAGES</string>
+    <string name="description">
+        some tutorial\n
+        1.click on create session(server) to create server without any functions(not client) \n
+        2.session no work without server \n
+        3.click on "join to session" to create client". Clients may speak and listen with other clients in one session \n
+    </string>
+</resources>
