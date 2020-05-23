@@ -18,8 +18,6 @@ public class MainActivity extends AppCompatActivity {
     public static final String ERROR_TAG = "ERROR";
     public static final String LOG_TAG = "MY_TAG";
     private Button buttonFind, buttonRec;
-    private TextView textView;
-    public static boolean absoluteIf = true;
     private Dialog dialog;
     private Spinner spinner;
     private ArrayAdapter<String> adapter;
@@ -52,7 +50,6 @@ public class MainActivity extends AppCompatActivity {
 
         buttonFind = findViewById(R.id.buttonFind);
         buttonRec = findViewById(R.id.buttonRec);
-        textView = findViewById(R.id.textView);
         dialog = new Dialog(MainActivity.this);
 
 

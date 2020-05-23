@@ -17,6 +17,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Server {
     public static final String LOG_TAG = "MY_TAG";
@@ -26,12 +28,12 @@ public class Server {
     private final DatagramSocket dSocket;
     private ServerSocket serverSocket;
     private SocketList socketsList;
-    private MessageQueue messages;
+    private Queue<String> messages;
     private String broad_IP;
     private boolean absoluteIf = true;
     public Server(String password, String broad_IP) throws IOException {
         this.broad_IP = broad_IP;
-        messages = new MessageQueue();
+        messages = new LinkedList<>();
         socketsList = new SocketList();
         this.password = password;
         serverSocket = new ServerSocket(TCP_PORT);

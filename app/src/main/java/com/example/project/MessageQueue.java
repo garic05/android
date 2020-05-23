@@ -7,21 +7,17 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class MessageQueue {
-    private Queue<String> queue;
+    private Queue<Message> queue;
 
     public MessageQueue() {
         queue = new LinkedList<>();
     }
 
-    public synchronized void offer(String msg) {
-        Log.d("MY_TAG", "start offer" + msg);
-        if (queue.offer(msg))
-            Log.d("MY_TAG", "offer" + msg);
-        else
-            Log.d("MY_TAG", "not offer" + msg);
+    public synchronized void offer(Message msg) {
+        queue.offer(msg);
     }
 
-    public synchronized String poll() {
+    public synchronized Message poll() {
         return queue.poll();
     }
 }

@@ -14,7 +14,6 @@ import android.text.Spanned;
 import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -28,6 +27,7 @@ import androidx.core.app.ActivityCompat;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Locale;
 
 public class SeansActivity extends Activity {
@@ -51,8 +51,10 @@ public class SeansActivity extends Activity {
     private MyTextToSpeech textToSpeech;
 
     private ListView listView;
-    private ArrayAdapter<String> adapter;
-    private String deviceIs, code, recMessage;
+    private LinkedList<Message> messagesList;
+    private MessagesAdapter adapter;
+    private String deviceIs, code;
+    private Message recMessage;
     private Handler handler;
     private Client client;
     private Server server;
@@ -65,15 +67,17 @@ public class SeansActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_seans);
         {
+            lang = getIntent().getStringExtra("lang");
+            Locale.setDefault(Locale.forLanguageTag(lang));
             textToSpeech = new MyTextToSpeech(this);
-            adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
+            messagesList = new LinkedList<>();
+            adapter = new MessagesAdapter(getApplicationContext(), R.layout.message, messagesList);
             listView = findViewById(R.id.listView);
             listView.setAdapter(adapter);
             handler = new Handler();
             handler.post(timerTask);
             code = getIntent().getStringExtra(CODE_TAG);
             deviceIs = getIntent().getStringExtra(DEVICE_TAG);
-            lang = getIntent().getStringExtra("lang");
             Log.d(LOG_TAG, "seans lang =" + lang);
 
             toggleButton = findViewById(R.id.toggle_button);
@@ -93,7 +97,6 @@ public class SeansActivity extends Activity {
             intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, lang);
-            Locale.setDefault(Locale.forLanguageTag(lang));
 
             SpannableString content = new SpannableString("X");
             content.setSpan(new ImageSpan(this, R.drawable.micro_on), 0, 1,
@@ -151,16 +154,6 @@ public class SeansActivity extends Activity {
                 }
         }
     }
-    @Override
-    protected void onStop() {
-        super.onStop();
-        super.onStop();
-        if (speechRecognizer != null) {
-            speechRecognizer.destroy();
-            Log.i(LOG_TAG, "destroy");
-        }
-    }
-
     private final Runnable timerTask = new Runnable() {
         @Override
         public void run() {
@@ -170,12 +163,20 @@ public class SeansActivity extends Activity {
                     sendingMessage = "";
                 }
             }
-            if (deviceIs.equals(CLIENT_TAG)) {
+            if (deviceIs.equals(CLIENT_TAG) && !textToSpeech.isSpeaking()) {
                 recMessage = client.getRecMessage();
 //            Log.d(LOG_TAG, "recMessage seans" + recMessage);
                 if (recMessage != null) {
-                    adapter.add(recMessage);
-                    textToSpeech.speak(recMessage);
+
+                    if (!messagesList.isEmpty() && messagesList.getLast().IP.equals(recMessage.IP))
+                        messagesList.set(
+                                        messagesList.size()-1,
+                                        new Message(recMessage.IP, (messagesList.getLast().message + recMessage.message))
+                        );
+                    else
+                        messagesList.addLast(recMessage);
+                    adapter.notifyDataSetChanged();
+                    textToSpeech.speak(recMessage.message);
 
 //                Log.d(LOG_TAG, "recMessage set to view " + recMessage);
                 }
@@ -242,7 +243,7 @@ public class SeansActivity extends Activity {
 
             partMessage = word.substring(lastListenMessage.length());//part mess = word - lastlistenmessage
 
-            if (partMessage.contains(".") || partMessage.length() > 100) {
+            if (partMessage.contains(".") || partMessage.length() > 200) {
                 sendingMessage = partMessage;
                 lastListenMessage += partMessage;
                 partMessage = "";

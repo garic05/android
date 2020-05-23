@@ -37,15 +37,14 @@ public class Translater {
         service = retrofit.create(ServiceAPI.class);
     }
 
-    public void translate(String text, final MessageQueue messageQueue) {
+    public void translate(final Message message, final MessageQueue messageQueue) {
         mapJson = new HashMap<>();
         mapJson.put("key", KEY);
-        mapJson.put("text", text);
+        mapJson.put("text", message.message);
         mapJson.put("lang", lang);
-        Log.d("MY_TAG", "start translate" + text);
-        int[] t;
+//        Log.d("MY_TAG", "start translate" + text);
 //        returnTranslStr = "";
-        if (text.length() > 0){
+        if (message.message.length() > 0){
             new Thread(){
                 @Override
                 public void run() {
@@ -57,13 +56,16 @@ public class Translater {
                         @Override
                         public void onResponse(Call<TranslateData> call, Response<TranslateData> response) {
                             TranslateData translateData = response.body();
-                            messageQueue.offer(translateData.getText().toString());
+                            messageQueue.offer(new Message(
+                                                    message.IP,
+                                                    translateData.getText().toString()
+                            ));
 //                            Log.d("MY_TAG", "end translate" + returnTranslStr);
                         }
 
                         @Override
                         public void onFailure(Call<TranslateData> call, Throwable t) {
-                            messageQueue.offer("ошибка");
+                            messageQueue.offer(new Message(" " + message.IP, "error"));
                         }
                     });
                 }

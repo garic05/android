@@ -135,10 +135,9 @@ public class Client {
                         message = gson.fromJson(
                                 new String(recBytes, 0, length),
                                 Message.class);
-                        Log.d(LOG_TAG, message.substring(0, GUID_LENGTH+1));
-                        if (message.substring(0, GUID_LENGTH).equals(GUID))
+                        if (message.IP.equals(MY_IP))
                             continue;
-                        translater.translate(message.substring(GUID_LENGTH), receivedMessages);
+                        translater.translate(message, receivedMessages);
                     } catch (IOException e) {
                         Log.d(LOG_TAG, "rec IO" + e.getMessage());
                         e.printStackTrace();
@@ -155,7 +154,6 @@ public class Client {
     public synchronized void sendTCP(final String msg) {
         new Thread() {
             private  Message message;
-
             @Override
             public void run() {
                 super.run();
@@ -173,7 +171,7 @@ public class Client {
         }.start();
     }
 
-    public String getRecMessage() {
+    public Message getRecMessage() {
         return receivedMessages.poll();
     }
 
