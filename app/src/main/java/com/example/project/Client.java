@@ -38,28 +38,8 @@ public class Client {
         receivedMessages = new MessageQueue();
         dSocket = new DatagramSocket(UDP_PORT);
         this.code = code;
-//        socket = new Socket();
         receiveBroad();
         Log.d(LOG_TAG, "OK");
-
-//        new Thread(){
-//            String message;
-//            @Override
-//            public void run() {
-//                super.run();
-//                while (true) {
-//                    message = receivedMessages.poll();
-//                    if (message != null) {
-//                        Log.d(LOG_TAG, message);
-//                    }
-//                    try {
-//                        Thread.sleep(100);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//            }
-//        }.start();
     }
 
 
@@ -85,7 +65,6 @@ public class Client {
                                 break;
                             }
                         }
-//                        Log.d(LOG_TAG, "udp received:" + UDPRecMessage.peek().IP);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } catch (Exception e){
